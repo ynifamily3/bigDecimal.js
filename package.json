@@ -1,0 +1,19 @@
+{
+  "name": "jslib",
+  "version": "1.0.0",
+  "description": "jslib",
+  "main": "bigDecimal.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ynifamily3/bigDecimal.js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ynifamily3/bigDecimal.js/issues"
+  },
+  "homepage": "https://github.com/ynifamily3/bigDecimal.js#readme"
+}
