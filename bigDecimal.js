@@ -11,15 +11,38 @@ function BigDecimal(strExp) {
             return new BigDecimal(strExp);
         }
     }
-    
-    this.val = strExp;
-    this.add = function(other) {
-        
-    };
+    if(!strExp) return new BigDecimal("0");
+      if(typeof(strExp) === 'object') {
+          if(strExp instanceof BigDecimal) {
+              return strExp;
+          } else {
+              //warn
+              return new BigDecimal("0");
+          }
+      } else if(typeof(strExp) === 'string') {
+          //기본형이므로 우선 구현
+          this.val = strExp;
+      } else if(typeof(strExp) === 'number') {
+          return new BigDecimal(''+strExp);
+      } else {
+          //warn
+          return new BigDecimal("0");
+      }
 }
-
-BigDecimal.prototype.toString = function() {
-    return this.val;
+BigDecimal.fn = BigDecimal.prototype = {
+    init: function(Exp) {
+      
+    },
+    toString: function() {
+        return this.val;
+    },
+    add: function(other) {
+        if(!other) return this;
+        if(typeof(other) === 'object' && other instanceof BigDecimal) {
+            return "환원됨 : " + other;
+        }
+        else return this.add(BigDecimal(other));
+    }
 };
 
 if(typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
