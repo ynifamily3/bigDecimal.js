@@ -2,6 +2,16 @@
 !function() {
     
 function BigDecimal(strExp) {
+    if(typeof global !== 'undefined') {
+        if(this == global) {
+            return new BigDecimal(strExp);
+        }
+    } else if(typeof window !== 'undefined') {
+        if(this == window) {
+            return new BigDecimal(strExp);
+        }
+    }
+    
     this.val = strExp;
     this.add = function(other) {
         
@@ -10,7 +20,7 @@ function BigDecimal(strExp) {
 
 BigDecimal.prototype.toString = function() {
     return this.val;
-}
+};
 
 if(typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = BigDecimal;

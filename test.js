@@ -1,10 +1,8 @@
 var BigDecimal = require('./bigDecimal.js');
 var assert = require('assert');
 
-var number1 = new BigDecimal("10.25");
-var number2 = new BigDecimal("23.33");
-
-var number3 = number1.add(number2);
+var number1 = BigDecimal("10.25");
+var number2 = BigDecimal("23.33");
 
 /*
 describe('Array', function() {
