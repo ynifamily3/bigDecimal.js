@@ -135,7 +135,41 @@ function string_add(strExp1, strExp2) {
 }
 
 function string_sub(strExp1, strExp2) {
-    
+    //항상 strExp1 >= strExp2 임을 가정한다.
+    var lptr = strExp1.length - 1;
+    var llen = lptr + 1;
+    var rptr = strExp2.length - 1;
+    var carry = 0;
+    var n1 = strExp1.split("").map(function(x){return Number(x)});
+    var n2 = strExp2.split("").map(function(x){return Number(x)});
+    while(lptr >= 0 && rptr >= 0) {
+        var ln = n1[lptr];
+        var rn = n2[rptr];
+        var res;
+        if(ln >= rn) {
+            res = (10 * carry + ln - rn) % 10;
+            n1[lptr] = res;
+        } else {
+            var moving = 1;
+            carry = 1;
+            while(lptr - moving >= 0) {
+                if(n1[lptr - moving] != 0) {
+                    n1[lptr - moving]--;
+                    break;
+                }
+                else {
+                    n1[lptr-moving] = 9;
+                    moving++;
+                    continue;
+                }
+            }
+            res = (10 * carry + ln - rn) % 10;
+            n1[lptr] = res;
+        }
+        lptr--;
+        rptr--;
+    }
+    return trim_zero_l(n1).join("");
 }
 
 if(typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
