@@ -1,6 +1,6 @@
 //bigDecimal.js
 !function() {
-    
+ var bGlobal = this;   
 function BigDecimal(strExp) {
     //check execution environment
     if(typeof global !== 'undefined') {
@@ -37,8 +37,12 @@ function BigDecimal(strExp) {
 
 BigDecimal.fn = BigDecimal.prototype = {
     init: function(Exp) {
-        console.log("객체 생성" + Exp);
-      this.val = Exp;
+        this.val = Exp;
+        this.prop = {
+            numerator : "0",
+            denominator : "1"
+        }; //dbg, this->var
+        parseNumber.call(this, Exp, this.prop); //dbg, this(2nd)->delete this.
     },
     toString: function() {
         return this.val;
@@ -59,13 +63,53 @@ BigDecimal.extend = BigDecimal.fn.extend = function(obj, prop) {
 	}
 	for (var i in prop)
 	    obj[i] = prop[i];
-	return Object.freeze(obj);
+	//return Object.freeze(obj);
+	return obj;
 };
 
 //const value, method
 BigDecimal.extend({
     PI: 3.14
 });
+
+function parseNumber(strExpNumber, prop) {
+    var re = /[+-]?(Infinity|NaN|\d+)/g;
+    var container = strExpNumber.match(re);
+    if(!container || container.length == 0 || container.length > 2)
+        throw new Error("Unexpected Number : " + strExpNumber);
+    
+    if(container[0][0] == '-') prop.sign = 0;
+    else prop.sign = 1;
+    if(container[0][0] == '-' || container[0][0] == '+')
+        prop.integer = container[0].slice(1);
+    else prop.integer = container[0];
+    prop.integer = trim_zero_l(prop.integer);
+    if(container.length == 2) {
+        prop.numerator = trim_zero_l(container[1].split("")).join("");
+        prop.denominator = "1"+"0".repeat(container[1].length);
+    }
+}
+
+function trim_zero_l(arrExp) {
+    //왼쪽 끝 0 잘라냄
+    for(var i = 0; i < arrExp.length; i++) {
+        if(arrExp[i] != 0) {
+            return arrExp.slice(i);
+        }
+    }
+    return arrExp;
+}
+
+function trim_zero_r(arrExp) {
+    //오른쪽 끝 0 잘라냄
+    for(var i = arrExp.length-1; i >= 0; i--) {
+        if(arrExp[i] != 0) {
+            arrExp.length = i+1;
+            break;
+        }
+    }
+    return arrExp;
+}
 
 function string_add(strExp1, strExp2) {
     var length1 = strExp1.length;
@@ -87,13 +131,7 @@ function string_add(strExp1, strExp2) {
         carry = piece >= 10 ? 1 : 0;
     }
     if(carry > 0) n3.push(carry);
-    for(var i = n3.length-1; i >= 0; i--) {
-        if(n3[i] != 0) {
-            n3.length = i+1;
-            break;
-        }
-    }
-    return n3.reverse().join("");
+    return trim_zero_r(n3).reverse().join("");
 }
 
 function string_sub(strExp1, strExp2) {
