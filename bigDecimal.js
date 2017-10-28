@@ -59,7 +59,7 @@ BigDecimal.extend = BigDecimal.fn.extend = function(obj, prop) {
 	}
 	for (var i in prop)
 	    obj[i] = prop[i];
-	return obj;
+	return Object.freeze(obj);
 };
 
 //const value, method
