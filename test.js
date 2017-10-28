@@ -1,18 +1,12 @@
 var BigDecimal = require('./bigDecimal.js');
 var assert = require('assert');
 
-var number1 = BigDecimal("10.25");
-var number2 = BigDecimal("23.33");
-number1.add(1);
-number1.add("1");
-number1.add(BigDecimal("30"));
-number1.add(function(){});
-/*
-describe('Array', function() {
-    describe("#indexOf()", function() {
-        it('should return -1 when the value is not present', function() {
-            assert.equal(-1, [1,2,3].indexOf(4));
-        });
-    });
-});
-*/
+console.log(BigDecimal(0).add(0));
+console.log(BigDecimal(1).add(1));
+console.log(BigDecimal(00).add(00));
+console.log(BigDecimal(1924).add(768));
+console.log(BigDecimal(768).add(1024));
+
+console.log(BigDecimal("03").add("000000000"));
+console.log(BigDecimal("003").add("00"));
+console.log(BigDecimal("9999999").add("9999999999999999999999"));
