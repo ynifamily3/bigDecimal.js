@@ -2,36 +2,43 @@
 !function() {
     
 function BigDecimal(strExp) {
+    //check execution environment
     if(typeof global !== 'undefined') {
         if(this == global) {
             return new BigDecimal(strExp);
         }
-    } else if(typeof window !== 'undefined') {
+    }
+    else if(typeof window !== 'undefined') {
         if(this == window) {
             return new BigDecimal(strExp);
         }
     }
+    
+    //nomalize BigDecimal Object Creation
     if(!strExp) return new BigDecimal("0");
-      if(typeof(strExp) === 'object') {
-          if(strExp instanceof BigDecimal) {
+    
+    if(typeof(strExp) === 'string') {
+          this.init(strExp);
+    }
+    else if(typeof(strExp) === 'object') {
+        if(strExp instanceof BigDecimal) {
               return strExp;
           } else {
-              //warn
               return new BigDecimal("0");
           }
-      } else if(typeof(strExp) === 'string') {
-          //기본형이므로 우선 구현
-          this.val = strExp;
-      } else if(typeof(strExp) === 'number') {
-          return new BigDecimal(''+strExp);
-      } else {
-          //warn
-          return new BigDecimal("0");
-      }
+        }
+        else if(typeof(strExp) === 'number') {
+            return new BigDecimal(''+strExp);
+        }
+        else {
+            return new BigDecimal("0");
+        }
 }
+
 BigDecimal.fn = BigDecimal.prototype = {
     init: function(Exp) {
-      
+        console.log("객체 생성" + Exp);
+      this.val = Exp;
     },
     toString: function() {
         return this.val;
@@ -45,12 +52,20 @@ BigDecimal.fn = BigDecimal.prototype = {
     }
 };
 
-function times(item, n) {
-    if(n<0) return "";
-    var ret = "";
-    while(n--) ret += item;
-    return ret;
-}
+BigDecimal.extend = BigDecimal.fn.extend = function(obj, prop) {
+	if (!prop) { 
+	    prop = obj;
+	    obj = this;
+	}
+	for (var i in prop)
+	    obj[i] = prop[i];
+	return obj;
+};
+
+//const value, method
+BigDecimal.extend({
+    PI: 3.14
+});
 
 function string_add(strExp1, strExp2) {
     var length1 = strExp1.length;
