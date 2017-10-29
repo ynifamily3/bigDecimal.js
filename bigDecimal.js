@@ -1,6 +1,5 @@
 //bigDecimal.js
 !function() {
- var bGlobal = this;   
 function BigDecimal(strExp) {
     //check execution environment
     if(typeof global !== 'undefined') {
@@ -24,8 +23,16 @@ function BigDecimal(strExp) {
         if(strExp instanceof BigDecimal) {
               return strExp;
           } else {
-              //구문해석으로 값을 그대로 집어넣을수 있게 한다. {val:~,props:{~}}
-              return new BigDecimal("0");
+              if(strExp.opcreated) {
+                  this.init(strExp);
+                  //구문해석으로 값을 그대로 집어넣을수 있게 한다. {val:~,props:{~}}
+                  this.val = strExp.val;
+                  this.setProp("sign", strExp.prop.sign);
+                  this.setProp("integer", strExp.prop.integer);
+                  this.setProp("numerator", strExp.prop.numerator);
+                  this.setProp("denominator", strExp.prop.denominator);
+              }
+              else return new BigDecimal("0");
           }
         }
         else if(typeof(strExp) === 'number') {
@@ -38,7 +45,8 @@ function BigDecimal(strExp) {
 
 BigDecimal.fn = BigDecimal.prototype = {
     init: function(Exp) {
-        this.val = Exp;
+        if(!Exp.opcreated)
+            this.val = Exp;
         var prop = {
             sign: 1,
             integer : "0",
@@ -47,11 +55,19 @@ BigDecimal.fn = BigDecimal.prototype = {
         };
         //내부적인 값으로 사용하고 싶은데, 다른 오브젝트와 상호작용하려면 그 값이 필요한 모순?
         this.getProp = function() { return prop; };
-        parseNumber.call(this, Exp, this.getProp());
+        this.setProp = function(propName, propValue) {
+            if(Exp.opcreated)
+                prop[propName]=propValue; //변경완료 후 얼리기
+            else
+                throw new Error("수정불가");
+            
+        };
+        if(!Exp.opcreated) {
+            parseNumber.call(this, Exp, this.getProp());
+        }
     },
     toString: function() {
         var props = this.getProp();
-        console.log(props);
         return (props.sign == 0 ? "-":"") + props.integer + (props.numerator != 0 ? (" + " + props.numerator + "/" + props.denominator):"");
     },
     add: function(other) {
@@ -59,7 +75,7 @@ BigDecimal.fn = BigDecimal.prototype = {
         if(typeof(other) === 'object' && other instanceof BigDecimal) {
             var prop1 = this.getProp();
             var prop2 = other.getProp();
-            var result = {prop:{}};
+            var result = {opcreated:true, prop:{}};
             if(prop1.sign === prop2.sign) {
                 //부호 같음 상태
                 if(prop1.denominator.length === prop2.denominator.length) {
@@ -68,11 +84,13 @@ BigDecimal.fn = BigDecimal.prototype = {
                     result.prop.integer = string_add(prop1.integer, prop2.integer);
                     result.prop.numerator = string_add(prop1.numerator, prop2.numerator);
                     result.prop.denominator = prop1.denominator;
-                    if(0/*두 string 을 compare 필요*/) {
-                        //분모 0 붙이기
-                        //분자 분모만큼 빼기
-                        //정수부 증감
+                    result.val = ''+result.prop.integer+'.'+result.prop.numerator; //dbg
+                    if(compare(prop1.denominator, result.prop.numerator) == 1) {
+                        //결과의 분자 분모 비교하여  분자가 더작으면
+                        //그대로 덧셈 (아무것도 안한다.)
                     }
+                    //dbg(다른 case 연구 해야됨.)
+                    return new BigDecimal(result);
                 }
             }
         }
@@ -107,7 +125,6 @@ function parseNumber(strExpNumber, prop) {
     //1.0, sign,integer ~~~~~
     var re = /[+-]?(Infinity|NaN|\d+)/g;
     var container = strExpNumber.match(re);
-    console.log(container);
     if(!container || container.length == 0 || container.length > 2) {
         throw new Error("Unexpected Number : " + strExpNumber);
     }
@@ -144,6 +161,17 @@ function trim_zero_r(arrExp) {
         }
     }
     return arrExp;
+}
+
+function compare(strExp1, strExp2) {
+    //왼쪽이 크면 1 오른쪽이 크면 -1 같으면 0
+    if(strExp1.length>strExp2.length) return 1;
+    else if(strExp1.length<strExp2.length) return -1;
+    for(var i = 0; i < strExp1.length; i++) {
+        if(strExp1[i] < strExp1[i]) return -1;
+        else if(strExp1[i]>strExp1[i]) return 1;
+    }
+    return 0;
 }
 
 function string_add(strExp1, strExp2) {
