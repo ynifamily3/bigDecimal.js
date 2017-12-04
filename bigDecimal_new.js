@@ -2,7 +2,10 @@
 var BD = {
     // Enums
     PLUS: 1,
-    MINUS: 0
+    MINUS: 0,
+    LFET_BIG: 1,
+    RIGHT_BIG: -1,
+    EQUAL: 0
 };
 
 function BigDecimal(strExp) {
@@ -67,24 +70,34 @@ function BigDecimal(strExp) {
                 
                 //부호를 본다. 부호가 다르면 빼고(큰쪽에서 작은쪽) 같으면 더하고
                 if(state.sign === otherState.sign) {
-                   var r_sum = string_add(state.integer+state.numerator, otherState.integer+otherState.numerator);
-                   //뒤에서 소수점을 자른다. (denominator 만큼만)
-                    /*
-                    10.23
-99.99
-
--> 1023 + 9999 = 110.22 (뒤에서 두번째 점 찍음)
-
-10.01
-99.99
-
--> 1001 + 9999 = 110.00 (뒤에서 두번째 점 찍음)
-                    */
+                    //전체적으로 바로 아래 소스에서 문제 발생 (repeat 함수가 음수)
+                   var r_sum = string_add(state.integer+'0'.repeat(state.denominator-state.numerator.length-1)+state.numerator,
+                   otherState.integer+'0'.repeat(otherState.denominator-otherState.numerator.length-1)+otherState.numerator);
+                   retState.integer = r_sum.slice(0, -state.denominator+1);
+                   retState.numerator = trimNumber_l(trimNumber_r(r_sum.slice(-state.denominator+1)));
                 }
                 else {
-                    
+                    //부호가 다름. (일단 절댓값 큰수 - 작은수) -> 절댓값 큰수쪽의 부호를 따름
+                    var cp1 = state.integer+'0'.repeat(state.denominator-state.numerator.length-1)+state.numerator;
+                    var cp2 = otherState.integer+'0'.repeat(otherState.denominator-otherState.numerator.length-1)+otherState.numerator;
+                    var d_sum;
+                    var compare = string_compare(cp1, cp2);
+                    if (compare === BD.LEFT_BIG) {
+                         d_sum = string_sub(cp1, cp2);
+                         retState.integer = r_sum.slice(0, -state.denominator+1);
+                         retState.numerator = trimNumber_l(trimNumber_r(r_sum.slice(-state.denominator+1)));
+                         
+                    } else {
+                         d_sum = string_sub(cp2, cp1);
+                         retState.integer = r_sum.slice(0, -state.denominator+1);
+                         retState.numerator = trimNumber_l(trimNumber_r(r_sum.slice(-state.denominator+1)));
+                    }
                 }
                 
+                
+            } else {
+                // 분모가 다를 경우
+                //분모를 맞춰주고 (작은쪽에서 큰쪽으로) 분자에 0을 그만큼 더한 뒤, 위에랑 똑같은 과정을 한다.
                 
             }
         } else if(state.circulating && otherState.circulating) {
@@ -191,6 +204,28 @@ function trim_zero_r(arrExp) {
         }
     }
     return arrExp;
+}
+
+function string_compare(strExp1, strExp2) {
+    // x.xx 이런 대소를 파악 가능함 (절댓값으로)
+    var str1 = strExp1.split('.');
+    var str2 = strExp2.split('.');
+    if(str1[0].length > str2[0].length) return BD.LEFT_BIG;
+    if(str1[0].length < str2[0].length) return BD.RIGHT_BIG;
+    
+    for(var i = 0; i < str1[0].length; i++) {
+        if(str1[0][i] > str2[0][i]) return BD.LEFT_BIG;
+        if(str1[0][i] < str2[0][i]) return BD.RIGHT_BIG;
+    }
+    
+    //소수점 이하의 비교에서는 length로 판별 불가 (0.0077 < 0.3)
+    //길이가 작은 거 기준으로 비교한다.
+    var lengthmin = str1[1].length > str2[1].length ? str2[1].length : str2[0].length;
+    for(var i = 0; i < lengthmin; i++) {
+        if(str1[1][i] > str2[1][i]) return BD.LEFT_BIG;
+        if(str1[1][i] < str2[1][i]) return BD.RIGHT_BIG;
+    }
+    return BD.EQUAL;
 }
 
 function string_add(strExp1, strExp2) {
