@@ -32,9 +32,13 @@ function BigDecimal(strExp) {
     }
     
     this.getState = function() {
+        /*
         var copyObj = {};
         for (var i in state) copyObj[i] = state[i];
         return copyObj;
+        */
+        // debug 목적 (state가 수정될 수 있음!)
+        return state;
     };
     
     this.isZero = function() {

@@ -1,6 +1,7 @@
 var BD = require('./enums');
 
 var Util_func = {
+    
 trimNumber_l: function (strExpNumber) {
     for(var i = 0; i < strExpNumber.length; i++) {
         if(strExpNumber[i] !== '0') return strExpNumber.slice(i);
@@ -14,44 +15,71 @@ trimNumber_r: function (strExpNumber) {
     }
     return '0';
 },
-parseNumber: function (strExpNumber, prop) {
-    var re = /[+-]?(Infinity|NaN|\d+)/g;
-    var container = strExpNumber.match(re);
-    if(!container || container.length == 0 || container.length > 2) {
-        throw new Error("Unexpected Number : " + strExpNumber);
-    }
-    
-    var sliced = container[0].slice(1);
-    // 부호 판별
-    if(container[0][0] == '-') prop.sign = BD.MINUS;
-    
-    //특수 판별
-    if(container[0] === 'Infinity' || sliced === 'Infinity') {
-        prop._isFinite = false;
-    }
-    else if(container[0] === 'NaN' || sliced === 'NaN') {
+
+parseNumber: function (strExpNumber, circulating_segment) {
+    var prop = {
+        _isNaN: false,
+        sign: BD.PLUS,
+        _isFinite: true,
+        integer: '0',
+        circulating: {
+            isCirculating: false,
+            segment: ''
+        },
+        numerator: '',
+        denominator: 1,
+    };
+    var check = /[+-]?(Infinity|NaN|\d+)/g;
+    var container = (''+strExpNumber).match(check);
+    if(!container) throw new Error("Unexpected Number");
+    // NaN Check
+    if(container[0] === 'NaN' || container[0] === '-NaN' || container[0] === '+NaN') {
         prop._isNaN = true;
+        return prop;
     }
-    
-    // 정수부 판별
-    if(prop._isFinite && !prop._isNaN) { // if 가 성립하지 않을 경우 굳이 정수부와 소수부 판별 불필요
-        if(container[0][0] == '-' || container[0][0] == '+')
-            prop.integer = this.trimNumber_l(sliced); // '00007.3' 의 '00007'을 '7'로 고침
-        else prop.integer = this.trimNumber_l(container[0]);
-        
-        // 소수부 판별
-        if(container.length == 2) {
-            prop.numerator = this.trimNumber_r(container[1]); // '0.3000'의 '3000'을 '3'으로 고침
-            if(prop.numerator.length === 1 && prop.numerator[0] === '0') {
-                prop.denominator = 1;
-            } else {
-                prop.denominator = prop.numerator.length + 1; // '0.007' 의 '007'을 보고 4(3+1)를 저장
-                prop.numerator = this.trimNumber_l(prop.numerator); // '0.007' 의 '007'을 '7'로 고침
-            }
+    // sign Check
+    if(container[0][0] === '-') {
+        prop.sign = BD.MINUS;
+    }
+    // cut sign
+    var integer = container[0];
+    if(container[0][0] === '-' || container[0][0] === '+') {
+        integer = integer.slice(1);
+    }
+    // finite check
+    if(integer === 'Infinity') {
+        prop._isFinite = false;
+        return prop;
+    }
+    // integer check
+    prop.integer = this.trimNumber_l(integer);
+
+    // circulating check
+    if(circulating_segment) {
+        check = /\d+/;
+        var container2 = (''+circulating_segment).match(check);
+        if(container2.length === 1) {
+            prop.circulating.isCirculating = true;
+            prop.circulating.segment = this.trimNumber_l(container2[0]);
         }
     }
+    
+    // numerator check
+    if(!prop.isCirculating) {
+        prop.numerator = this.trimNumber_r(container[1]);
+    }
+    else {
+        prop.numerator = container[1];
+    }
+    
+    // denominator check
+    prop.denominator = prop.numerator.length + 1;
+    
+    return prop;
 }
-};
+
+
+}; // end of Util_func
 
 
 if(typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
