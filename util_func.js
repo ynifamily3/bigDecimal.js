@@ -21,13 +21,9 @@ parseNumber: function (strExpNumber, circulating_segment) {
         _isNaN: false,
         sign: BD.PLUS,
         _isFinite: true,
-        integer: '0',
-        circulating: {
-            isCirculating: false,
-            segment: ''
-        },
-        numerator: '',
-        denominator: 1,
+        integer: '0', // 정수
+        circulating: '0', // 순환마디
+        numerator: '' // 순환마디를 제외한 소수점 아래 수
     };
     var check = /[+-]?(Infinity|NaN|\d+)/g;
     var container = (''+strExpNumber).match(check);
@@ -59,21 +55,17 @@ parseNumber: function (strExpNumber, circulating_segment) {
         check = /\d+/;
         var container2 = (''+circulating_segment).match(check);
         if(container2.length === 1) {
-            prop.circulating.isCirculating = true;
-            prop.circulating.segment = this.trimNumber_l(container2[0]);
+            prop.circulating = this.trimNumber_l(container2[0]);
         }
     }
     
     // numerator check
-    if(!prop.isCirculating) {
+    if(prop.circulating !== '0') {
         prop.numerator = this.trimNumber_r(container[1]);
     }
     else {
         prop.numerator = container[1];
     }
-    
-    // denominator check
-    prop.denominator = prop.numerator.length + 1;
     
     return prop;
 }

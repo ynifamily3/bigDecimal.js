@@ -37,6 +37,61 @@ function BigDecimal(strExp, circulating_segment) {
         return 'add method';
     };
     
+    Object.defineProperties(this, {
+        'isCirculating': {
+            get: function() { 
+                if(state.circulating !== '0')
+                    return true;
+                return false;
+            }
+        },
+        'circulating': {
+            get: function() {
+                if(this.isCirculating) return state.circulating;
+                return null;
+            }
+        },
+        'isNaN': {
+            get: function() {
+                return state._isNaN;
+            }
+        },
+        'isFinite': {
+            get: function() {
+                return state._isFinite;
+            }
+        },
+        'sign': {
+            get: function() {
+                return state.sign === 0 ? '-':'+';
+            }
+        },
+        'integer': {
+            get: function() {
+                if(!state._isNaN)
+                    return state.integer;
+                return 'NaN';
+            }
+        },
+        'numerator': {
+            get: function() {
+                if(!state.numerator) return null;
+                return state.numerator;
+            }
+        },
+        'denominator': {
+            get: function() {
+                return state.numerator.length + 1;
+            }
+        }
+    });
+    
+    BigDecimal.prototype.toString = function() {
+        if(this.isNaN) return 'NaN';
+        if(!this.isFinite) return this.sign==='+'?'':'-' + 'Infinity';
+        return this.sign + "투스트링";
+    }
+    
     
 }
     
