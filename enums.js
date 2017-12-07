@@ -4,7 +4,8 @@ var BD = {
     MINUS: 0,
     LFET_BIG: 1,
     RIGHT_BIG: -1,
-    EQUAL: 0
+    EQUAL: 0,
+    ROUND: 6
 };
 
 if(typeof module !== 'undefined' && typeof module.exports !== 'undefined') {

@@ -60,10 +60,22 @@ parseNumber: function (strExpNumber, circulating_segment) {
     }
     
     // numerator check
-    if(prop.circulating !== '0') {
+    if(prop.circulating === '0') {
+        // 순환하지 않으면
         prop.numerator = this.trimNumber_r(container[1]);
+        // 전부 0이라면 없앰
+        var flag = false;
+        for(var i = 0; i < prop.numerator.length; i++) {
+            if(prop.numerator[i] !== '0') {
+                flag = true;
+            };
+        }
+        if(!flag) {
+            prop.numerator = '';
+        }
     }
     else {
+        // 순환하면
         prop.numerator = container[1];
     }
     

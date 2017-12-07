@@ -68,14 +68,14 @@ function BigDecimal(strExp, circulating_segment) {
         },
         'integer': {
             get: function() {
-                if(!state._isNaN)
-                    return state.integer;
-                return 'NaN';
+                if(this.isNaN) return null;
+                if(!this.isFinite) return null;
+                return (this.sign==='+'?'':'-') + state.integer;
             }
         },
         'numerator': {
             get: function() {
-                if(!state.numerator) return null;
+                if(!state.numerator) return '';
                 return state.numerator;
             }
         },
@@ -83,13 +83,32 @@ function BigDecimal(strExp, circulating_segment) {
             get: function() {
                 return state.numerator.length + 1;
             }
+        },
+        'isInteger': {
+            get: function() {
+                if(this.isNaN || !this.isFinite || this.isCirculating)
+                    return false;
+                if(this.numerator) return false;
+                return true;
+            }
         }
     });
     
     BigDecimal.prototype.toString = function() {
         if(this.isNaN) return 'NaN';
-        if(!this.isFinite) return this.sign==='+'?'':'-' + 'Infinity';
-        return this.sign + "투스트링";
+        if(!this.isFinite) return (this.sign==='+'?'':'-') + 'Infinity';
+        var under = this.numerator;
+        if(this.isCirculating) {
+            var length = this.circulating.length; // 1
+            var letlng = Math.floor(BD.ROUND / length); // 6 / 1
+            var woosuri = BD.ROUND % length;
+            
+            var woosuriElement = this.circulating.slice(0, woosuri);
+            var tmp = this.circulating.repeat(letlng) + woosuriElement.slice(0, -1);
+            var end = parseInt(woosuriElement.slice(-1));
+            under += tmp + (end>= 5 ? end+1: end);
+        }
+        return this.integer + (this.isInteger?'':('.'+under));
     }
     
     
