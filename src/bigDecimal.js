@@ -110,7 +110,7 @@ function BigDecimal(strExp, circulating_segment) {
     
     
 }
-      window.BigDecimal = BigDecimal; //브라우저 fiy?
+
 if(typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = BigDecimal;
 } else {
