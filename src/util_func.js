@@ -87,15 +87,4 @@ parseNumber: function (strExpNumber, circulating_segment) {
 
 }; // end of Util_func
 
-
-if(typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports = Util_func;
-} else {
-    if (typeof define === 'function' && define.amd) {
-        define([], function() {
-            return Util_func;
-        });
-    } else {
-        window.BigDecimal = Util_func;
-    }
-}
+module.exports = Util_func;

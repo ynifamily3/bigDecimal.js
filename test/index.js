@@ -1,10 +1,10 @@
-const BigDecimal = require('./bigDecimal');
+const BigDecimal = require('../src/bigDecimal');
 const assert = require('assert');
 
-var w = BigDecimal("-4.0000");
+var w = BigDecimal("-0000000004.0000");
 var x = BigDecimal("00007.3");
 var y = BigDecimal("0.0023");
-var z = BigDecimal("-7.29999927", "1289"); //순환소수이다. (3.299992712891289...)
+var z = BigDecimal("-7.3", "1289"); //순환소수이다. (3.299992712891289...)
 
 describe('BigDecimal', function() {
     describe('데이터 저장 테스트', function() {
@@ -18,7 +18,7 @@ describe('BigDecimal', function() {
        it('순환소수 테스트', function() {
            assert.equal(true, z.isCirculating);
            assert.equal('-7', z.integer);
-           assert.equal('1234', z.circulating);
+           assert.equal('1289', z.circulating);
        });
        it('정수 테스트', function() {
            assert.equal('-4', w.integer);

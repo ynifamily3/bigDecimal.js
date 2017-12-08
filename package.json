@@ -15,5 +15,13 @@
   "bugs": {
     "url": "https://github.com/ynifamily3/bigDecimal.js/issues"
   },
-  "homepage": "https://github.com/ynifamily3/bigDecimal.js#readme"
+  "homepage": "https://github.com/ynifamily3/bigDecimal.js#readme",
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-util": "^3.0.8"
+  }
 }

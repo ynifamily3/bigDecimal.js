@@ -97,23 +97,20 @@ function BigDecimal(strExp, circulating_segment) {
     BigDecimal.prototype.toString = function() {
         if(this.isNaN) return 'NaN';
         if(!this.isFinite) return (this.sign==='+'?'':'-') + 'Infinity';
-        var under = this.numerator;
-        if(this.isCirculating) {
-            var length = this.circulating.length; // 1
-            var letlng = Math.floor(BD.ROUND / length); // 6 / 1
-            var woosuri = BD.ROUND % length;
-            
-            var woosuriElement = this.circulating.slice(0, woosuri);
-            var tmp = this.circulating.repeat(letlng) + woosuriElement.slice(0, -1);
-            var end = parseInt(woosuriElement.slice(-1));
-            under += tmp + (end>= 5 ? end+1: end);
+        var under = this.numerator.slice(0, BD.ROUND + 1);
+        if(this.isCirculating && under.length < BD.ROUND) {
+            var woosuri = BD.ROUND - under.length;
+            for(var i = 0; i < woosuri; i++) {
+                under += this.circulating[i%this.circulating.length];
+            }
         }
+        // 반올림시 연쇄작용을 서술해야하므로 불편하다... 그냥 버리기로 (일단)
         return this.integer + (this.isInteger?'':('.'+under));
     }
     
     
 }
-    
+      window.BigDecimal = BigDecimal; //브라우저 fiy?
 if(typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = BigDecimal;
 } else {
